@@ -330,9 +330,15 @@ object Settings extends Build {
     assemblyOption in assembly ~= { _.copy(includeScala = false) },
     assemblyMergeStrategy in assembly <<= (assemblyMergeStrategy in assembly) {
       (old) => {
-        case PathList("META-INF", "io.netty.versions.properties", xs @ _*) => MergeStrategy.last
-        case PathList("com", "google", xs @ _*) => MergeStrategy.last
-        case PathList("META-INF", "io.netty.versions.properties") => MergeStrategy.last
+        case x if x == "META-INF/jboss-beans.xml" => MergeStrategy.last
+        case x if x.endsWith(".class") => MergeStrategy.last
+        case x if x.endsWith("beans.xml") => MergeStrategy.last
+        case x if x.endsWith(".properties") => MergeStrategy.last
+        case x if x.contains("/resources/") => MergeStrategy.last
+        case x if x.startsWith("META-INF/mailcap") => MergeStrategy.last
+        case x if x.startsWith("META-INF/native") => MergeStrategy.last
+        case x if x.startsWith("META-INF/mimetypes.default") => MergeStrategy.first
+        case x if x.startsWith("META-INF/maven") => MergeStrategy.last
         case x => old(x)
       }
     }
