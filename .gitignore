@@ -19,5 +19,9 @@ cassandra-server/*
 .worksheet
 .idea
 .idea_modules
+.classpath
+.project
+.settings
+.cache-main
 
 checkpoint
