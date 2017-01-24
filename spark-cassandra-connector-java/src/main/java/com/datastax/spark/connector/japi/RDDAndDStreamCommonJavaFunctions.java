@@ -176,7 +176,7 @@ public abstract class RDDAndDStreamCommonJavaFunctions<T> {
             if (!Objects.equals(writeConf.batchSize(), batchSize))
                 return withWriteConf(
                     new WriteConf(batchSize, writeConf.batchGroupingBufferSize(), writeConf.batchGroupingKey(),
-                        writeConf.consistencyLevel(), writeConf.parallelismLevel(), writeConf.throughputMiBPS(),
+                        writeConf.consistencyLevel(), writeConf.ignoreNulls(), writeConf.parallelismLevel(), writeConf.throughputMiBPS(),
                         writeConf.ttl(), writeConf.timestamp(), writeConf.taskMetricsEnabled()));
             else
                 return this;
@@ -194,7 +194,7 @@ public abstract class RDDAndDStreamCommonJavaFunctions<T> {
             if (writeConf.batchGroupingBufferSize() != batchGroupingBufferSize)
                 return withWriteConf(
                     new WriteConf(writeConf.batchSize(), batchGroupingBufferSize, writeConf.batchGroupingKey(),
-                        writeConf.consistencyLevel(), writeConf.parallelismLevel(), writeConf.throughputMiBPS(),
+                        writeConf.consistencyLevel(), writeConf.ignoreNulls(), writeConf.parallelismLevel(), writeConf.throughputMiBPS(),
                         writeConf.ttl(), writeConf.timestamp(), writeConf.taskMetricsEnabled()));
             else
                 return this;
@@ -212,7 +212,7 @@ public abstract class RDDAndDStreamCommonJavaFunctions<T> {
             if (!Objects.equals(writeConf.batchGroupingKey(), batchGroupingKey))
                 return withWriteConf(
                     new WriteConf(writeConf.batchSize(), writeConf.batchGroupingBufferSize(), batchGroupingKey,
-                        writeConf.consistencyLevel(), writeConf.parallelismLevel(), writeConf.throughputMiBPS(),
+                        writeConf.consistencyLevel(), writeConf.ignoreNulls(), writeConf.parallelismLevel(), writeConf.throughputMiBPS(),
                         writeConf.ttl(), writeConf.timestamp(), writeConf.taskMetricsEnabled()));
             else
                 return this;
@@ -230,7 +230,7 @@ public abstract class RDDAndDStreamCommonJavaFunctions<T> {
             if (writeConf.consistencyLevel() != consistencyLevel)
                 return withWriteConf(
                     new WriteConf(writeConf.batchSize(), writeConf.batchGroupingBufferSize(), writeConf.batchGroupingKey(),
-                        consistencyLevel, writeConf.parallelismLevel(), writeConf.throughputMiBPS(),
+                        consistencyLevel, writeConf.ignoreNulls(), writeConf.parallelismLevel(), writeConf.throughputMiBPS(),
                         writeConf.ttl(), writeConf.timestamp(), writeConf.taskMetricsEnabled()));
             else
                 return this;
@@ -248,7 +248,7 @@ public abstract class RDDAndDStreamCommonJavaFunctions<T> {
             if (writeConf.parallelismLevel() != parallelismLevel)
                 return withWriteConf(
                     new WriteConf(writeConf.batchSize(), writeConf.batchGroupingBufferSize(), writeConf.batchGroupingKey(),
-                        writeConf.consistencyLevel(), parallelismLevel, writeConf.throughputMiBPS(),
+                        writeConf.consistencyLevel(), writeConf.ignoreNulls(), parallelismLevel, writeConf.throughputMiBPS(),
                         writeConf.ttl(), writeConf.timestamp(), writeConf.taskMetricsEnabled()));
             else
                 return this;
@@ -266,7 +266,7 @@ public abstract class RDDAndDStreamCommonJavaFunctions<T> {
             if (writeConf.throughputMiBPS() != throughputMBPS)
                 return withWriteConf(
                     new WriteConf(writeConf.batchSize(), writeConf.batchGroupingBufferSize(), writeConf.batchGroupingKey(),
-                        writeConf.consistencyLevel(), writeConf.parallelismLevel(), throughputMBPS,
+                        writeConf.consistencyLevel(), writeConf.ignoreNulls(), writeConf.parallelismLevel(), throughputMBPS,
                         writeConf.ttl(), writeConf.timestamp(), writeConf.taskMetricsEnabled()));
             else
               return this;
@@ -284,7 +284,7 @@ public abstract class RDDAndDStreamCommonJavaFunctions<T> {
             if (writeConf.taskMetricsEnabled() != taskMetricsEnabled)
                 return withWriteConf(
                         new WriteConf(writeConf.batchSize(), writeConf.batchGroupingBufferSize(), writeConf.batchGroupingKey(),
-                                writeConf.consistencyLevel(), writeConf.parallelismLevel(), writeConf.throughputMiBPS(),
+                                writeConf.consistencyLevel(), writeConf.ignoreNulls(), writeConf.parallelismLevel(), writeConf.throughputMiBPS(),
                                 writeConf.ttl(), writeConf.timestamp(), taskMetricsEnabled));
             else
                 return this;
@@ -298,6 +298,7 @@ public abstract class RDDAndDStreamCommonJavaFunctions<T> {
                     writeConf.batchGroupingBufferSize(),
                     writeConf.batchGroupingKey(),
                     writeConf.consistencyLevel(),
+                    writeConf.ignoreNulls(),
                     writeConf.parallelismLevel(),
                     writeConf.throughputMiBPS(),
                     writeConf.ttl(),
@@ -377,6 +378,7 @@ public abstract class RDDAndDStreamCommonJavaFunctions<T> {
                     writeConf.batchGroupingBufferSize(),
                     writeConf.batchGroupingKey(),
                     writeConf.consistencyLevel(),
+                    writeConf.ignoreNulls(),
                     writeConf.parallelismLevel(),
                     writeConf.throughputMiBPS(),
                     ttl,

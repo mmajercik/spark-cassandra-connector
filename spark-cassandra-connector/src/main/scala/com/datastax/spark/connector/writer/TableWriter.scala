@@ -142,7 +142,7 @@ class TableWriter[T] private (
         Some(updater.batchFinished(success = true, _, _, _)), Some(updater.batchFinished(success = false, _, _, _)))
       val routingKeyGenerator = new RoutingKeyGenerator(tableDef, columnNames)
       val batchType = if (isCounterUpdate) Type.COUNTER else Type.UNLOGGED
-      val boundStmtBuilder = new BoundStatementBuilder(rowWriter, stmt)
+      val boundStmtBuilder = new BoundStatementBuilder(rowWriter, stmt, ignoreNulls = writeConf.ignoreNulls)
       val batchStmtBuilder = new BatchStatementBuilder(batchType, routingKeyGenerator, writeConf.consistencyLevel)
       val batchKeyGenerator = batchRoutingKey(session, routingKeyGenerator) _
       val batchBuilder = new GroupingBatchBuilder(boundStmtBuilder, batchStmtBuilder, batchKeyGenerator,

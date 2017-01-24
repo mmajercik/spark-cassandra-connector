@@ -26,6 +26,7 @@ case class WriteConf(batchSize: BatchSize = BatchSize.Automatic,
                      batchGroupingBufferSize: Int = WriteConf.BatchBufferSizeParam.default,
                      batchGroupingKey: BatchGroupingKey = WriteConf.BatchLevelParam.default,
                      consistencyLevel: ConsistencyLevel = WriteConf.ConsistencyLevelParam.default,
+                     ignoreNulls: Boolean = WriteConf.IgnoreNullsParam.default,
                      parallelismLevel: Int = WriteConf.ParallelismLevelParam.default,
                      throughputMiBPS: Double = WriteConf.ThroughputMiBPSParam.default,
                      ttl: TTLOption = TTLOption.defaultValue,
@@ -103,6 +104,15 @@ object WriteConf {
     default = 5,
     description = """Maximum number of batches executed in parallel by a
       | single Spark task""".stripMargin)
+
+  val IgnoreNullsParam = ConfigParameter[Boolean](
+    name = "spark.cassandra.output.ignoreNulls",
+    section = ReferenceSection,
+    default = false,
+    description =
+      """ In Cassandra >= 2.2 null values can be left as unset in bound statements. Setting
+        |this to true will cause all null values to be left as unset rather than bound. For
+        |finer control see the CassandraOption class""".stripMargin)
   
   val ThroughputMiBPSParam = ConfigParameter[Double] (
     name = "spark.cassandra.output.throughput_mb_per_sec",
@@ -127,6 +137,7 @@ object WriteConf {
     BatchSizeRowsParam,
     BatchBufferSizeParam,
     BatchLevelParam,
+    IgnoreNullsParam,
     ParallelismLevelParam,
     ThroughputMiBPSParam,
     TaskMetricsParam
@@ -142,6 +153,8 @@ object WriteConf {
       conf.get(ConsistencyLevelParam.name, ConsistencyLevelParam.default.name()))
 
     val batchSizeInRowsStr = conf.get(BatchSizeRowsParam.name, "auto")
+
+    val ignoreNulls = conf.getBoolean(IgnoreNullsParam.name, IgnoreNullsParam.default)
 
     val batchSize = {
       val Number = "([0-9]+)".r
@@ -171,6 +184,7 @@ object WriteConf {
       batchGroupingBufferSize = batchBufferSize,
       batchGroupingKey = batchGroupingKey,
       consistencyLevel = consistencyLevel,
+      ignoreNulls = ignoreNulls,
       parallelismLevel = parallelismLevel,
       throughputMiBPS = throughputMiBPS,
       taskMetricsEnabled = metricsEnabled)
