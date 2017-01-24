@@ -64,6 +64,13 @@ may also be used. ("127.0.0.1,192.168.0.1")
   <td>Minimum period of time to wait before reconnecting to a dead node</td>
 </tr>
 <tr>
+  <td><code>connection.session_interface</code></td>
+  <td>com.datastax.driver.core.Session</td>
+  <td>(Expert Use Only) The interface that the Session Proxy should use when connecting
+with Cassandra.
+      </td>
+</tr>
+<tr>
   <td><code>connection.timeout_ms</code></td>
   <td>5000</td>
   <td>Maximum period of time to attempt connecting to a node</td>

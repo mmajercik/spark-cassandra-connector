@@ -2,7 +2,11 @@ package com.datastax.spark.connector.cql
 
 import java.lang.reflect.{InvocationHandler, InvocationTargetException, Method, Proxy}
 
+import com.datastax.spark.connector.util.{ConfigParameter, Logging}
 import com.datastax.driver.core.{RegularStatement, Session, SimpleStatement}
+import org.apache.spark.SparkEnv
+
+import scala.util.Try
 
 /** Wraps a `Session` and intercepts:
   *  - `close` method to invoke `afterClose` handler
@@ -47,7 +51,31 @@ class SessionProxy(session: Session, afterClose: Session => Any) extends Invocat
   }
 }
 
-object SessionProxy {
+object SessionProxy extends Logging {
+
+
+  val SessionInterfaceParam = new ConfigParameter[String](
+    name = "spark.cassandra.connection.session_interface",
+    section = CassandraConnectorConf.ReferenceSection,
+    default = "com.datastax.driver.core.Session",
+    description =
+      """(Expert Use Only) The interface that the Session Proxy should use when connecting
+        |with Cassandra.
+      """.stripMargin
+  )
+
+  val Properties = Set(SessionInterfaceParam)
+
+  lazy val sessionInterface = Class.forName(
+    Try(SparkEnv.get.conf
+      .get(SessionInterfaceParam.name, SessionInterfaceParam.default))
+      .recover { case ex =>
+        logWarning(
+          s"""Defaulting to ${SessionInterfaceParam.name} to
+             |${SessionInterfaceParam.default}: $ex""".stripMargin)
+        SessionInterfaceParam.default
+      }.get
+  )
 
   /** Creates a new `SessionProxy` delegating to the given `Session`.
     * The proxy adds prepared statement caching functionality. */
@@ -60,6 +88,6 @@ object SessionProxy {
   def wrapWithCloseAction(session: Session)(afterClose: Session => Any): Session =
     Proxy.newProxyInstance(
       session.getClass.getClassLoader,
-      Array(classOf[Session]),
+      Array(sessionInterface),
       new SessionProxy(session, afterClose)).asInstanceOf[Session]
 }
