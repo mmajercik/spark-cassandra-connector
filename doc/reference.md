@@ -207,6 +207,13 @@ OSS Cassandra this should never be used.</td>
   <td>Consistency level to use when reading	</td>
 </tr>
 <tr>
+  <td><code>input.custom_table_scan_method</code></td>
+  <td>None</td>
+  <td>(Expert Use Only) Allows for an alternate method for executing statements
+against Cassandra.
+      </td>
+</tr>
+<tr>
   <td><code>input.fetch.size_in_rows</code></td>
   <td>1000</td>
   <td>Number of CQL rows fetched per driver request</td>

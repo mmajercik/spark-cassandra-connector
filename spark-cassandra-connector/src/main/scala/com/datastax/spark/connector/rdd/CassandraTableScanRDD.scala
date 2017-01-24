@@ -11,7 +11,7 @@ import com.datastax.spark.connector.rdd.reader._
 import com.datastax.spark.connector.types.ColumnType
 import com.datastax.spark.connector.util.CqlWhereParser.{EqPredicate, InListPredicate, InPredicate, Predicate, RangePredicate}
 import com.datastax.spark.connector.util.Quote._
-import com.datastax.spark.connector.util.{CountingIterator, CqlWhereParser}
+import com.datastax.spark.connector.util.{CountingIterator, CqlWhereParser, ReflectionUtil}
 import com.datastax.spark.connector.writer.RowWriterFactory
 import org.apache.spark.metrics.InputMetricsUpdater
 import org.apache.spark.rdd.{PartitionCoalescer, RDD}
@@ -323,17 +323,6 @@ class CassandraTableScanRDD[R] private[connector](
     }
   }
 
-
-  private def getScanExecuteMethod(
-    session: Session,
-    columnNames: IndexedSeq[String]): Statement => (Iterator[Row], CassandraRowMetadata) =
-  /*CHECK PARAMETER OR */ { case statement =>
-    val rs = session.execute(statement)
-    val columnMetaData = CassandraRowMetadata.fromResultSet(columnNames, rs)
-    val iterator = new PrefetchingResultSetIterator(rs, fetchSize)
-    (iterator, columnMetaData)
-  }
-
   private def fetchTokenRange(
     session: Session,
     range: CqlTokenRange[_, _],
@@ -359,6 +348,19 @@ class CassandraTableScanRDD[R] private[connector](
         throw new IOException(s"Exception during execution of $cql: ${t.getMessage}", t)
     }
   }
+
+  val customTableScanMethodOption = sc.getConf.getOption(ReadConf.CustomTableScanMethodParam.name)
+  private def getScanExecuteMethod(
+    session: Session,
+    columnNames: IndexedSeq[String]): Statement => (Iterator[Row], CassandraRowMetadata) =
+    customTableScanMethodOption match {
+      case Some(scanMethodName) => {
+        logDebug(s"Obtaining Custom Scan Method $scanMethodName")
+        val methodHolder = ReflectionUtil.findGlobalObject[CustomTableScanMethod](scanMethodName)
+        methodHolder.getScanMethod(readConf, session, columnNames)
+      }
+      case None => DefaultTableScanMethod.getScanMethod(readConf, session, columnNames)
+    }
 
   override def compute(split: Partition, context: TaskContext): Iterator[R] = {
     val session = connector.openSession()
