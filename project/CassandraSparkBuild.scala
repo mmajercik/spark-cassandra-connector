@@ -134,8 +134,7 @@ object Artifacts {
   import Versions._
 
   implicit class Exclude(module: ModuleID) {
-    def guavaExclude: ModuleID =
-      module exclude("com.google.guava", "guava")
+    def guavaExclude: ModuleID = module.exclude("com.google.guava", "guava")
 
     def sparkExclusions: ModuleID = module.guavaExclude
       .exclude("org.apache.spark", s"spark-core_$scalaBinary")

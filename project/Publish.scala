@@ -23,21 +23,16 @@ object Publish extends Build {
   val altReleaseDeploymentRepository = sys.props.get("publish.repository.releases")
   val altSnapshotDeploymentRepository = sys.props.get("publish.repository.snapshots")
 
-  val nexus = "https://oss.sonatype.org"
-  val defaultReleaseDeploymentRepository = nexus + "/service/local/staging/deploy/maven2"
-  val defaultSnapshotDeploymentRepository = nexus + "/content/repositories/snapshots"
+  val nexus = "http://develop:8081/nexus/content/repositories"
+  val defaultReleaseDeploymentRepository = nexus + "/releases"
+  val defaultSnapshotDeploymentRepository = nexus + "/snapshots"
 
   val releasesDeploymentRepository =
     "releases" at (altReleaseDeploymentRepository getOrElse defaultReleaseDeploymentRepository)
   val snapshotsDeploymentRepository =
     "snapshots" at (altSnapshotDeploymentRepository getOrElse defaultSnapshotDeploymentRepository)
 
-  lazy val inlineCredentials = for (
-    realm ← sys.props.get("publish.repository.credentials.realm");
-    host ← sys.props.get("publish.repository.credentials.host");
-    user ← sys.props.get("publish.repository.credentials.user");
-    password ← sys.props.get("publish.repository.credentials.password")
-  ) yield Credentials(realm, host, user, password)
+  lazy val inlineCredentials = Some(Credentials("Sonatype Nexus Repository Manager", "develop", "admin", "admin"))
 
   lazy val resolvedCredentials = inlineCredentials getOrElse {
     val altCredentialsLocation = sys.props.get("publish.repository.credentials.file").map(new File(_))
